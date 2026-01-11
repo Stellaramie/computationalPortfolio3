@@ -72,12 +72,11 @@ def initial_ne(xx, kx, amp):
 def initial_Ue ( xx ):
     return xx * 0.0
 
-def simulate_electron_density_in_time(N, T_e_hat):
+def simulate_electron_density_in_spacetime(x_hat, t_hat, T_e_hat, method="RK45"):
     # Create initial values
-    x_hat = linspace(0, 1, N, endpoint=False);
+    N = len(x_hat);
     n_e_hat0 = initial_ne(x_hat, 4., 0.01);
     U_e_hat0 = initial_Ue(x_hat);
-    t_hat = linspace(0, 2*pi, 251, endpoint=False);
 
     y0 = concatenate([n_e_hat0, U_e_hat0]);
 
@@ -86,14 +85,17 @@ def simulate_electron_density_in_time(N, T_e_hat):
         t_span=[t_hat[0], t_hat[-1]],
         y0=y0,
         t_eval=t_hat,
-        args=[x_hat, T_e_hat]
+        args=[x_hat, T_e_hat],
+        method=method
     );
 
-    pcm = plt.pcolormesh(t_hat, x_hat, result.y[:N]);
+    return result.y[:N], result.y[N:];
+
+def plot_electron_density_in_spacetime(t_hat, x_hat, n_e_hats, title):
+    pcm = plt.pcolormesh(t_hat, x_hat, n_e_hats);
     plt.colorbar(pcm, label=r"Electron density normalised as $\hat{n}_e = \frac{n_e}{n_p}$");
     plt.xlabel(r"Time normalised as $\hat{t} = t \omega_p$");
     plt.ylabel(r"Distance normalised as $\hat{x} = \frac{x}{\lambda_D}$");
-    title = r"Evolution of normalised electron density, $\hat{n}_e$, in normalised time, $\hat{t}$." + "\n" + r"Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p}$ is equal to " + str(T_e_hat) + ".";
     plt.title(title);
     plt.show();
 
@@ -124,11 +126,44 @@ def main():
 
     # Finding the time derivatives T_e_hat = 0
     # ----------------------------------------
-    simulate_electron_density_in_time(401, 0.);
+    t_hat_T0 = linspace(0, 2*pi, 251, endpoint=False);
+    x_hat_T0 = linspace(0, 1, 401, endpoint=False);
+    T_e_hat_T0=0.
+    title_T0 = r"Evolution of normalised electron density, $\hat{n}_e$, in normalised time, $\hat{t}$." + "\n" + r"Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p}$ is equal to " + str(T_e_hat_T0) + ". Using RK45 method to solve IVP.";
+
+    n_e_hats_T0, _ = simulate_electron_density_in_spacetime(x_hat_T0, t_hat_T0, T_e_hat_T0);
 
     # Finding the time derivatives T_e_hat = 1
     # ----------------------------------------
-    simulate_electron_density_in_time(401, 1.);
+    t_hat_RK45 = linspace(0, 4*pi, 501, endpoint=False); # Running for longer than specified to compare to Radau at later times
+    x_hat_RK45 = linspace(0, 1, 401, endpoint=False);
+    T_e_hat_RK45=1.
+    title_RK45 = r"Evolution of normalised electron density, $\hat{n}_e$, in normalised time, $\hat{t}$." + "\n" + r"Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p}$ is equal to " + str(T_e_hat_RK45) + ". Using RK45 method to solve IVP.";
+
+    n_e_hats_RK45, _ = simulate_electron_density_in_spacetime(x_hat_RK45, t_hat_RK45, T_e_hat_RK45);
+
+    # Finding the time derivatives T_e_hat = 1 using Radau method
+    # -----------------------------------------------------------
+    t_hat_Rad = linspace(0, 4*pi, 501, endpoint=False);
+    x_hat_Rad = linspace(0, 1, 401, endpoint=False);
+    T_e_hat_Rad=1.
+    title_Rad = r"Evolution of normalised electron density, $\hat{n}_e$, in normalised time, $\hat{t}$." + "\n" + r"Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p}$ is equal to " + str(T_e_hat_Rad) + ". Using Radau method to solve IVP.";
+
+    n_e_hats_Rad, _ = simulate_electron_density_in_spacetime(x_hat_Rad, t_hat_Rad, T_e_hat_Rad, method="Radau");
+
+    # Produce all the plots
+    # ---------------------
+    plot_electron_density_in_spacetime(t_hat_T0, x_hat_T0, n_e_hats_T0, title_T0);
+    plot_electron_density_in_spacetime(t_hat_RK45[:251], x_hat_RK45, n_e_hats_RK45[:, :251], title_RK45);
+    plot_electron_density_in_spacetime(t_hat_Rad[251:], x_hat_Rad, n_e_hats_Rad[:, 251:], title_Rad);
+
+    plt.plot(x_hat_RK45, n_e_hats_RK45[:, 199], label="RK45");
+    plt.plot(x_hat_Rad, n_e_hats_Rad[:, 199], label="Radau");
+    plt.legend();
+    plt.title("Comparison of the accuracy of RK45 and Radau methods for solving electron density evolution in time.\n" + r"Slice in time taken at $\hat{t}$ = " + str("%.2g" % t_hat_Rad[199]));
+    plt.xlabel(r"Distance normalised as $\hat{x} = \frac{x}{\lambda_D}$");
+    plt.ylabel(r"Electron density normalised as $\hat{n}_e = \frac{n_e}{n_p}$");
+    plt.show();
 
 if __name__ == "__main__":
     main();
