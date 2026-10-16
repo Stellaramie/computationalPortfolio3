@@ -124,6 +124,7 @@ def main():
     plt.legend();
     plt.show();
 
+    print("Please wait - Solving IVPs...");
     # Finding the time derivatives T_e_hat = 0
     # ----------------------------------------
     t_hat_T0 = linspace(0, 2*pi, 251, endpoint=False);
@@ -133,9 +134,9 @@ def main():
 
     n_e_hats_T0, _ = simulate_electron_density_in_spacetime(x_hat_T0, t_hat_T0, T_e_hat_T0);
 
-    # Finding the time derivatives T_e_hat = 1
-    # ----------------------------------------
-    t_hat_RK45 = linspace(0, 4*pi, 501, endpoint=False); # Running for longer than specified to compare to Radau at later times
+    # Finding the time derivatives T_e_hat = 1 using RK45 method
+    # ----------------------------------------------------------
+    t_hat_RK45 = linspace(0, 2*pi, 251, endpoint=False);
     x_hat_RK45 = linspace(0, 1, 401, endpoint=False);
     T_e_hat_RK45=1.
     title_RK45 = r"Evolution of normalised electron density, $\hat{n}_e$, in normalised time, $\hat{t}$." + "\n" + r"Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p}$ is equal to " + str(T_e_hat_RK45) + ". Using RK45 method to solve IVP.";
@@ -144,7 +145,7 @@ def main():
 
     # Finding the time derivatives T_e_hat = 1 using Radau method
     # -----------------------------------------------------------
-    t_hat_Rad = linspace(0, 4*pi, 501, endpoint=False);
+    t_hat_Rad = linspace(0, 2*pi, 251, endpoint=False);
     x_hat_Rad = linspace(0, 1, 401, endpoint=False);
     T_e_hat_Rad=1.
     title_Rad = r"Evolution of normalised electron density, $\hat{n}_e$, in normalised time, $\hat{t}$." + "\n" + r"Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p}$ is equal to " + str(T_e_hat_Rad) + ". Using Radau method to solve IVP.";
@@ -154,8 +155,8 @@ def main():
     # Produce all the plots
     # ---------------------
     plot_electron_density_in_spacetime(t_hat_T0, x_hat_T0, n_e_hats_T0, title_T0);
-    plot_electron_density_in_spacetime(t_hat_RK45[:251], x_hat_RK45, n_e_hats_RK45[:, :251], title_RK45);
-    plot_electron_density_in_spacetime(t_hat_Rad[251:], x_hat_Rad, n_e_hats_Rad[:, 251:], title_Rad);
+    plot_electron_density_in_spacetime(t_hat_RK45, x_hat_RK45, n_e_hats_RK45, title_RK45);
+    plot_electron_density_in_spacetime(t_hat_Rad, x_hat_Rad, n_e_hats_Rad, title_Rad);
 
     plt.plot(x_hat_RK45, n_e_hats_RK45[:, 199], label="RK45");
     plt.plot(x_hat_Rad, n_e_hats_Rad[:, 199], label="Radau");
