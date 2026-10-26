@@ -1,11 +1,19 @@
 # Computational portfolio 3 - Plasma waves
 
-Using python and SciPy to simulate a one dimensional periodic plasma.
+Using python and SciPy to simulate a one dimensional periodic plasma. See `Portfolio3.pdf` for the context behind this code. See `Computational_Plasma_Physics__Portfolio_Assignment_3.pdf` for a full write up.
+
+## Usage
+
+After cloning the repo run `simulate_plasma_waves.py` in an IDE of your choice or by entering the following command in the command line:
+```
+python3 simulate_plasma_waves.py
+```
+This will calculate and plot the electric field before solving the initial value problems (using initial $n_e$ and $U_e$ set by functions `initial_ne` and `initial_Ue`) for $T_e = 0$ and $T_e = 1$ using both RK45 and Radau.
 
 ## Application
 
 ![T0](plot_E_time_distance_T=0_RK45.png)
-Electron density normalised as $\hat{n}_e = \frac{n_e}{n_p}$ shown in colour (where yellow is a higher density) plotted against distance normalised as $\hat{x} = \frac{x}{\lambda_D}$ on the y-axis and time normalised as $\hat{t} = t\omega_p$ on the x-axis. Electron density at $\hat{t} = 0$ is equal to $1$ in the first and last quarter of the distance range and defined by $\hat{n}_e = 1 + 0.01 \sin (8\pi \hat{x})$ in the centre. Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p} is equal to $0$. The method used for solving the initial value problem is RK45.
+Electron density normalised as $\hat{n}_e = \frac{n_e}{n_p}$ shown in colour (where yellow is a higher density) plotted against distance normalised as $\hat{x} = \frac{x}{\lambda_D}$ on the y-axis and time normalised as $\hat{t} = t\omega_p$ on the x-axis. Electron density at $\hat{t} = 0$ is equal to $1$ in the first and last quarter of the distance range and defined by $\hat{n}_e = 1 + 0.01 \sin (8\pi \hat{x})$ in the centre. Electron temperature normalised as $\hat{T}_e = \frac{T_e}{T_p}$ is equal to $0$. The method used for solving the initial value problem is RK45.
 
 In the areas where initial electron density is 1 there is no further oscillation in $\hat{n}_e$ as time progresses. In the areas where initial electron density is not equal to 1 there is a temporal oscillation in $\hat{n}_e$ about $\hat{n}_e = 1$ with a period of 2$\pi$ and a maximum amplitude of 0.01. The waves do not propagate in space as time progresses.
 
